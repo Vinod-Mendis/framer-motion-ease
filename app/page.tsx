@@ -1,13 +1,14 @@
 import { Playground } from "@/components/Playground";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="border-b bg-card">
+      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
               <svg 
                 width="20" 
                 height="20" 
@@ -25,8 +26,11 @@ export default function Home() {
             </div>
             <h1 className="font-bold text-xl tracking-tight">Framer Motion Easing Playground</h1>
           </div>
-          <div className="text-sm text-muted-foreground">
-            Built with Next.js & Framer Motion
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-muted-foreground hidden sm:block">
+              Built with Next.js & Framer Motion
+            </div>
+            <ModeToggle />
           </div>
         </div>
       </header>
