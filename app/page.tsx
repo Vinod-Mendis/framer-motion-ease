@@ -8,7 +8,7 @@ export default function Home() {
 
 
       {/* Main Content */}
-      <div className="flex-1 py-8 lg:py-12 bg-muted/30">
+      <div className="flex-1 bg-muted/30">
         <Playground />
       </div>
 
