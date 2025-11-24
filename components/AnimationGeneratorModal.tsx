@@ -122,7 +122,7 @@ useGSAP(() => {
           Open Animation Generator
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[95vw] w-full h-[90vh] flex flex-col overflow-hidden p-0 gap-0">
+      <DialogContent className="!max-w-6xl w-full h-[90vh] flex flex-col overflow-hidden p-0 gap-0">
         <DialogHeader className="p-6 border-b">
           <DialogTitle>Animation Code Generator</DialogTitle>
           <DialogDescription>
