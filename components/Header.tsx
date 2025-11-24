@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AnimationGeneratorModal } from "./AnimationGeneratorModal";
 
 export function Header() {
   const pathname = usePathname();
@@ -49,6 +50,7 @@ export function Header() {
               GSAP
             </Button>
           </Link>
+          <AnimationGeneratorModal />
         </nav>
 
         <div className="flex items-center gap-4">
