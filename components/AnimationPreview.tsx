@@ -12,6 +12,11 @@ interface AnimationPreviewProps {
   scale: number;
   opacity: number;
   rotate: number;
+  initialX: number;
+  initialY: number;
+  initialScale: number;
+  initialOpacity: number;
+  initialRotate: number;
   duration: number;
   delay: number;
   easing: EasingType | "custom";
@@ -28,6 +33,11 @@ export function AnimationPreview({
   scale,
   opacity,
   rotate,
+  initialX,
+  initialY,
+  initialScale,
+  initialOpacity,
+  initialRotate,
   duration,
   delay,
   easing,
@@ -67,22 +77,31 @@ export function AnimationPreview({
 
     // Reset and animate
     gsap.killTweensOf(gsapBoxRef.current);
-    gsap.set(gsapBoxRef.current, { x: 0, y: 0, scale: 1, opacity: 1, rotation: 0 });
     
-    gsap.to(gsapBoxRef.current, {
-      x,
-      y,
-      scale,
-      opacity,
-      rotation: rotate,
-      duration,
-      delay,
-      ease: easeString,
-      repeat: loop ? -1 : 0,
-      yoyo: yoyo,
-    });
+    // Use fromTo for explicit initial -> final animation
+    gsap.fromTo(gsapBoxRef.current, 
+      { 
+        x: initialX, 
+        y: initialY, 
+        scale: initialScale, 
+        opacity: initialOpacity, 
+        rotation: initialRotate 
+      },
+      {
+        x,
+        y,
+        scale,
+        opacity,
+        rotation: rotate,
+        duration,
+        delay,
+        ease: easeString,
+        repeat: loop ? -1 : 0,
+        yoyo: yoyo,
+      }
+    );
 
-  }, { dependencies: [x, y, scale, opacity, rotate, duration, delay, easing, customBezier, isGsap, loop, yoyo, playTrigger], scope: containerRef });
+  }, { dependencies: [x, y, scale, opacity, rotate, initialX, initialY, initialScale, initialOpacity, initialRotate, duration, delay, easing, customBezier, isGsap, loop, yoyo, playTrigger], scope: containerRef });
 
   // Framer Motion Easing
   const activeEasing = easing === "custom" ? customBezier : easing;
@@ -104,8 +123,14 @@ export function AnimationPreview({
         </div>
       ) : (
         <motion.div
-          key={playTrigger + JSON.stringify({ x, y, scale, opacity, rotate, duration, delay, easing, customBezier, loop, yoyo })} // Force re-render for replay
-          initial={{ x: 0, y: 0, scale: 1, opacity: 1, rotate: 0 }}
+          key={playTrigger + JSON.stringify({ x, y, scale, opacity, rotate, initialX, initialY, initialScale, initialOpacity, initialRotate, duration, delay, easing, customBezier, loop, yoyo })} // Force re-render for replay
+          initial={{ 
+            x: initialX, 
+            y: initialY, 
+            scale: initialScale, 
+            opacity: initialOpacity, 
+            rotate: initialRotate 
+          }}
           animate={{ x, y, scale, opacity, rotate }}
           transition={{
             duration,

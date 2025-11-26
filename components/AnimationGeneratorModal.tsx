@@ -20,6 +20,72 @@ import { CodeBlock } from "./CodeBlock";
 import { NAMED_EASINGS, EasingType } from "@/utils/easing";
 import { Wand2, Play, RotateCcw } from "lucide-react";
 
+interface PropertyControlProps {
+  label: string;
+  initialValue: number;
+  finalValue: number;
+  onInitialChange: (value: number) => void;
+  onFinalChange: (value: number) => void;
+  min: number;
+  max: number;
+  step: number;
+  unit?: string;
+}
+
+const PropertyControl = ({
+  label,
+  initialValue,
+  finalValue,
+  onInitialChange,
+  onFinalChange,
+  min,
+  max,
+  step,
+  unit,
+}: PropertyControlProps) => {
+  return (
+    <div className="space-y-3 p-4 bg-card rounded-lg border shadow-sm">
+      <div className="flex items-center justify-between">
+        <Label className="font-medium">{label}</Label>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <Label className="text-xs text-muted-foreground">Initial</Label>
+            <div className="relative w-16">
+              <Input
+                type="number"
+                value={initialValue}
+                onChange={(e) => onInitialChange(Number(e.target.value))}
+                className="h-7 w-full text-right pr-5 pl-1 py-0 text-xs"
+              />
+              {unit && <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">{unit}</span>}
+            </div>
+          </div>
+          <Slider min={min} max={max} step={step} value={[initialValue]} onValueChange={([v]) => onInitialChange(v)} />
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <Label className="text-xs text-muted-foreground">Final</Label>
+            <div className="relative w-16">
+              <Input
+                type="number"
+                value={finalValue}
+                onChange={(e) => onFinalChange(Number(e.target.value))}
+                className="h-7 w-full text-right pr-5 pl-1 py-0 text-xs"
+              />
+              {unit && <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">{unit}</span>}
+            </div>
+          </div>
+          <Slider min={min} max={max} step={step} value={[finalValue]} onValueChange={([v]) => onFinalChange(v)} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export function AnimationGeneratorModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [isGsap, setIsGsap] = useState(false);
@@ -30,6 +96,14 @@ export function AnimationGeneratorModal() {
   const [scale, setScale] = useState(1);
   const [opacity, setOpacity] = useState(1);
   const [rotate, setRotate] = useState(0);
+
+  // Initial State
+  const [initialX, setInitialX] = useState(0);
+  const [initialY, setInitialY] = useState(0);
+  const [initialScale, setInitialScale] = useState(1);
+  const [initialOpacity, setInitialOpacity] = useState(0);
+  const [initialRotate, setInitialRotate] = useState(0);
+
   const [duration, setDuration] = useState(0.5);
   const [delay, setDelay] = useState(0);
   const [easing, setEasing] = useState<EasingType | "custom">("easeInOut");
@@ -76,6 +150,16 @@ export function AnimationGeneratorModal() {
 
       return `// GSAP Animation
 useGSAP(() => {
+  // Set initial state
+  gsap.set(targetRef.current, {
+    x: ${initialX},
+    y: ${initialY},
+    scale: ${initialScale},
+    opacity: ${initialOpacity},
+    rotation: ${initialRotate},
+  });
+
+  // Animate to final state
   gsap.to(targetRef.current, {
     x: ${x},
     y: ${y},
@@ -96,6 +180,13 @@ useGSAP(() => {
 
       return `// Framer Motion Animation
 <motion.div
+  initial={{
+    x: ${initialX},
+    y: ${initialY},
+    scale: ${initialScale},
+    opacity: ${initialOpacity},
+    rotate: ${initialRotate},
+  }}
   animate={{
     x: ${x},
     y: ${y},
@@ -139,50 +230,76 @@ useGSAP(() => {
             </div>
 
             <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>X Position</Label>
-                  <span className="text-xs font-mono text-muted-foreground">{x}px</span>
-                </div>
-                <Slider min={-300} max={300} step={10} value={[x]} onValueChange={([v]) => setX(v)} />
-              </div>
+              <PropertyControl
+                label="X Position"
+                initialValue={initialX}
+                finalValue={x}
+                onInitialChange={setInitialX}
+                onFinalChange={setX}
+                min={-300}
+                max={300}
+                step={10}
+                unit="px"
+              />
 
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Y Position</Label>
-                  <span className="text-xs font-mono text-muted-foreground">{y}px</span>
-                </div>
-                <Slider min={-300} max={300} step={10} value={[y]} onValueChange={([v]) => setY(v)} />
-              </div>
+              <PropertyControl
+                label="Y Position"
+                initialValue={initialY}
+                finalValue={y}
+                onInitialChange={setInitialY}
+                onFinalChange={setY}
+                min={-300}
+                max={300}
+                step={10}
+                unit="px"
+              />
 
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Scale</Label>
-                  <span className="text-xs font-mono text-muted-foreground">{scale}</span>
-                </div>
-                <Slider min={0} max={2} step={0.1} value={[scale]} onValueChange={([v]) => setScale(v)} />
-              </div>
+              <PropertyControl
+                label="Scale"
+                initialValue={initialScale}
+                finalValue={scale}
+                onInitialChange={setInitialScale}
+                onFinalChange={setScale}
+                min={0}
+                max={2}
+                step={0.1}
+              />
 
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Opacity</Label>
-                  <span className="text-xs font-mono text-muted-foreground">{opacity}</span>
-                </div>
-                <Slider min={0} max={1} step={0.1} value={[opacity]} onValueChange={([v]) => setOpacity(v)} />
-              </div>
+              <PropertyControl
+                label="Opacity"
+                initialValue={initialOpacity}
+                finalValue={opacity}
+                onInitialChange={setInitialOpacity}
+                onFinalChange={setOpacity}
+                min={0}
+                max={1}
+                step={0.1}
+              />
 
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Rotate</Label>
-                  <span className="text-xs font-mono text-muted-foreground">{rotate}deg</span>
-                </div>
-                <Slider min={-360} max={360} step={15} value={[rotate]} onValueChange={([v]) => setRotate(v)} />
-              </div>
+              <PropertyControl
+                label="Rotate"
+                initialValue={initialRotate}
+                finalValue={rotate}
+                onInitialChange={setInitialRotate}
+                onFinalChange={setRotate}
+                min={-360}
+                max={360}
+                step={15}
+                unit="deg"
+              />
 
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <Label>Duration</Label>
-                  <span className="text-xs font-mono text-muted-foreground">{duration}s</span>
+                  <div className="relative w-20">
+                    <Input
+                      type="number"
+                      value={duration}
+                      onChange={(e) => setDuration(Number(e.target.value))}
+                      className="h-8 w-full text-right pr-6 pl-2 py-1 text-xs"
+                    />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">s</span>
+                  </div>
                 </div>
                 <Slider min={0.1} max={5} step={0.1} value={[duration]} onValueChange={([v]) => setDuration(v)} />
               </div>
@@ -190,7 +307,15 @@ useGSAP(() => {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <Label>Delay</Label>
-                  <span className="text-xs font-mono text-muted-foreground">{delay}s</span>
+                  <div className="relative w-20">
+                    <Input
+                      type="number"
+                      value={delay}
+                      onChange={(e) => setDelay(Number(e.target.value))}
+                      className="h-8 w-full text-right pr-6 pl-2 py-1 text-xs"
+                    />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground pointer-events-none">s</span>
+                  </div>
                 </div>
                 <Slider min={0} max={2} step={0.1} value={[delay]} onValueChange={([v]) => setDelay(v)} />
               </div>
@@ -256,6 +381,11 @@ useGSAP(() => {
                 scale={scale}
                 opacity={opacity}
                 rotate={rotate}
+                initialX={initialX}
+                initialY={initialY}
+                initialScale={initialScale}
+                initialOpacity={initialOpacity}
+                initialRotate={initialRotate}
                 duration={duration}
                 delay={delay}
                 easing={easing}
